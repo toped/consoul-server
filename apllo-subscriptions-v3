@@ -1,0 +1,103 @@
+const admin = require('firebase-admin')
+const functions = require('firebase-functions')
+const express = require('express')
+const { ApolloServer, gql } = require('apollo-server')
+const { createServer } = require('http')
+const { execute, subscribe } = require('graphql')
+const { SubscriptionServer } = require('subscriptions-transport-ws')
+const { makeExecutableSchema } = require('@graphql-tools/schema')
+
+var Twit = require('twit')
+
+const typeDefs = require('./types')
+const resolvers = require('./resolvers')
+var serviceAccount = require('./service_key.json')
+
+var twitterClient = new Twit({
+	consumer_key: functions.config().twitterapi.consumer_key,
+	consumer_secret: functions.config().twitterapi.consumer_secret,
+	access_token: functions.config().twitterapi.access_token,
+	access_token_secret: functions.config().twitterapi.access_token_secret,
+	timeout_ms: 60 * 1000, // optional HTTP request timeout to apply to all requests.
+	strictSSL: true // optional - requires SSL certificates to be valid.
+})
+
+admin.initializeApp({
+	credential: admin.credential.cert(serviceAccount),
+	databaseURL: 'https://memez-f18eb.firebaseio.com/',
+	storageBucket: 'memez-f18eb.appspot.com'
+})
+
+const app = express()
+
+const TimerModule = () => {
+	let timers = {}
+	const addTimer = (id, timer) => {
+		timers[id] = timer
+	}
+	const getTimers = () => timers
+	return {
+		addTimer,
+		getTimers
+	}
+}
+
+const timerModule = TimerModule()
+
+const context = async ({ req, res }) => {
+	return {
+		req,
+		res,
+		admin,
+		twitterClient,
+		timerModule
+	}
+}
+
+const httpServer = createServer(app)
+
+const schema = makeExecutableSchema({
+	typeDefs,
+	resolvers
+})
+
+const apolloServer = new ApolloServer({
+	schema,
+	context,
+	plugins: [{
+		async serverWillStart() {
+			return {
+				async drainServer() {
+					subscriptionServer.close()
+				}
+			}
+		}
+	}],
+})
+
+const subscriptionServer = SubscriptionServer.create(
+	{
+		schema,
+		execute,
+		subscribe,
+		onConnect(connectionParams, webSocket, context) {
+			console.log('Connected!')
+		},
+		onDisconnect(webSocket, context) {
+			console.log('Disconnected!')
+		},
+	},
+	{
+		server: httpServer,
+		path: apolloServer.graphqlPath
+	}
+)
+
+apolloServer.applyMiddleware({
+	app,
+	path: '/',
+	cors: true,
+	credentials: true
+})
+
+exports.graphql = functions.https.onRequest(app)

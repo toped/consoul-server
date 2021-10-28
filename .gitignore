@@ -46,18 +46,22 @@ typings/
 
 # TypeScript cache
 *.tsbuildinfo
+.runtimeconfig.json
 
 # Optional npm cache directory
 .npm
+.firebase-debug.log
 
 # Optional eslint cache
 .eslintcache
+service_keu.json
 
 # Microbundle cache
 .rpt2_cache/
 .rts2_cache_cjs/
 .rts2_cache_es/
 .rts2_cache_umd/
+ui.debug.log
 
 # Optional REPL history
 .node_repl_history
@@ -102,3 +106,4 @@ dist
 
 # TernJS port file
 .tern-port
+/firebaseFunctions
