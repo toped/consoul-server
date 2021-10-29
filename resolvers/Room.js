@@ -1,4 +1,5 @@
 const { ApolloError, PubSub } = require('apollo-server')
+const { withFilter } = require('graphql-subscriptions')
 const { Timer } = require('easytimer.js')
 const { nanoid } = require('nanoid')
 const roomHelpers = require('../utils/functions/roomHelpers')
@@ -34,6 +35,7 @@ const Room = {
 	Mutation: {
 		async createRoom(parent, { room }, { admin }) {
 			// Check if user has room with same name
+			room = JSON.parse(JSON.stringify(room))
 			if (await roomHelpers.roomExists(admin, room.host))
 				throw new ApolloError(messages.errors.USER_ALREADY_HOSTING)
 
@@ -44,7 +46,7 @@ const Room = {
 				.child('/rooms')
 				.push()
 				.key
-
+			
 			// Write the new data.
 			let updates = {}
 			updates[`/rooms/${newRoomKey}`] = {
@@ -52,14 +54,14 @@ const Room = {
 				slug: nanoid(5),
 				...room
 			}
-
+			
 			return admin
 				.database()
 				.ref()
 				.update(updates)
 				.then(() => roomHelpers.fetchRoom(admin, { identifier: 'host', value: room.host }))
 		},
-		async updateRoom(parent, { room }, { admin, timerModule }) {
+		async updateRoom(parent, { room }, { admin }) {
 			const currentRoom = await roomHelpers.fetchRoom(admin, { identifier: 'id', value: room.id })
 
 			if (!currentRoom)
@@ -69,7 +71,7 @@ const Room = {
 			// TO-DO: we need checks to make sure invalid data isn't written to db
 			let updates = {}
 			updates[`/rooms/${room.id}`] = {
-				...room
+				...currentRoom
 			}
 
 			return admin
@@ -105,7 +107,11 @@ const Room = {
 		// Listening fro subscription
 		roomUpdated: {
 			// More on pubsub later
-			subscribe: () => pubsub.asyncIterator(['ROOM_UPDATED']),
+			subscribe: withFilter(() => pubsub.asyncIterator('ROOM_UPDATED'), (payload, variables) => {
+				return payload.roomUpdated.then(room => {
+					return room.slug === variables.slug
+				})				
+			}),
 		}
 	}
 }

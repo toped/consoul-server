@@ -47,8 +47,7 @@ const Room = gql`
   }
 
   type Subscription {
-    playerJoined: GameRoom
-    roomUpdated: GameRoom
+    roomUpdated(slug: String!): GameRoom
   }
 `
 
