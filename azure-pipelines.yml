@@ -28,9 +28,6 @@ stages:
     pool:
       vmImage: $(vmImageName)
 
-    variables:
-    - group: twitter-api-credentials
-
     steps:
     - task: NodeTool@0
       inputs:
