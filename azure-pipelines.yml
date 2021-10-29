@@ -44,10 +44,10 @@ stages:
       displayName: 'npm install, build and test'
       env:
         PORT: 4000
-        CONSUMER_KEY: $(CONSUMER_KEY)
-        CONSUMER_SECRET: $(CONSUMER_SECRET)
-        ACCESS_TOKEN: $(ACCESS_TOKEN)
-        ACCESS_TOKEN_SECRET: $(ACCESS_TOKEN_SECRET)
+        CONSUMER_KEY: echo $(CONSUMER_KEY)
+        CONSUMER_SECRET: echo $(CONSUMER_SECRET)
+        ACCESS_TOKEN: echo $(ACCESS_TOKEN)
+        ACCESS_TOKEN_SECRET: echo $(ACCESS_TOKEN_SECRET)
     - task: ArchiveFiles@2
       displayName: 'Archive files'
       inputs:
