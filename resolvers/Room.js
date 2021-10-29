@@ -62,6 +62,8 @@ const Room = {
 				.then(() => roomHelpers.fetchRoom(admin, { identifier: 'host', value: room.host }))
 		},
 		async updateRoom(parent, { room }, { admin }) {
+			room = JSON.parse(JSON.stringify(room))
+
 			const currentRoom = await roomHelpers.fetchRoom(admin, { identifier: 'id', value: room.id })
 
 			if (!currentRoom)
@@ -71,7 +73,8 @@ const Room = {
 			// TO-DO: we need checks to make sure invalid data isn't written to db
 			let updates = {}
 			updates[`/rooms/${room.id}`] = {
-				...currentRoom
+				...currentRoom,
+				...room
 			}
 
 			return admin
