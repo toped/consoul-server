@@ -67,11 +67,18 @@ stages:
           steps:
           - task: AzureWebApp@1
             displayName: 'Azure Web App Deploy: consoullabs'
+            env:
+              PORT: 4000
+              CONSUMER_KEY: $(CONSUMER_KEY)
+              CONSUMER_SECRET: $(CONSUMER_SECRET)
+              ACCESS_TOKEN: $(ACCESS_TOKEN)
+              ACCESS_TOKEN_SECRET: $(ACCESS_TOKEN_SECRET)
             inputs:
               azureSubscription: $(azureSubscription)
               appType: webAppLinux
               appName: $(webAppName)
               runtimeStack: 'NODE|10.10'
               package: $(Pipeline.Workspace)/drop/$(Build.BuildId).zip
-              startUpCommand: 'npm run start PORT=4000 CONSUMER_KEY=$(CONSUMER_KEY) CONSUMER_SECRET=$(CONSUMER_SECRET) ACCESS_TOKEN=$(ACCESS_TOKEN) ACCESS_TOKEN_SECRET=$(ACCESS_TOKEN_SECRET)'
+              startUpCommand: 'npm run start'
               AppSettings: '-Port 4000'
+              
