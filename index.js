@@ -11,10 +11,10 @@ const resolvers = require('./resolvers')
 var serviceAccount = require('./service_key.json')
 
 var twitterClient = new Twit({
-	consumer_key: functions.config().twitterapi.consumer_key,
-	consumer_secret: functions.config().twitterapi.consumer_secret,
-	access_token: functions.config().twitterapi.access_token,
-	access_token_secret: functions.config().twitterapi.access_token_secret,
+	consumer_key: process.env.CONSUMER_KEY,
+	consumer_secret: process.env.CONSUMER_SECRET,
+	access_token: process.env.ACCESS_TOKEN,
+	access_token_secret: process.env.ACCESS_TOKEN_SECRET,
 	timeout_ms: 60 * 1000, // optional HTTP request timeout to apply to all requests.
 	strictSSL: true // optional - requires SSL certificates to be valid.
 })
