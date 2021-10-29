@@ -10,7 +10,7 @@ const typeDefs = require('./types')
 const resolvers = require('./resolvers')
 var serviceAccount = require('./service_key.json')
 
-console.log('consumer key should be', process.env.CONSUMER_KEY)
+console.log('consumer key should be', process.env)
 var twitterClient = new Twit({
 	consumer_key: process.env.CONSUMER_KEY,
 	consumer_secret: process.env.CONSUMER_SECRET,
