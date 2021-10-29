@@ -7,7 +7,6 @@ trigger:
 - develop
 
 variables:
-
   # Azure Resource Manager connection created during pipeline creation
   azureSubscription: 'a4a64d97-0595-430f-b537-46ac51f68e42'
 
@@ -28,6 +27,9 @@ stages:
     displayName: Build
     pool:
       vmImage: $(vmImageName)
+
+    variables:
+    - group: twitter-api-credentials
 
     steps:
     - task: NodeTool@0
