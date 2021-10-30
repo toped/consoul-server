@@ -31,6 +31,7 @@ const Room = gql`
   input GameRoomInput {
     id: ID
     host: String
+    slug: String
     players: [GameUserInput]
     settings: GameSettingsInput
   }
@@ -42,7 +43,12 @@ const Room = gql`
   }
 
   input GameUserInput {
+    displayName: String
+    email: String
+    photoURL: String
+    phoneNumber: String
     uid: ID
+    isHost: Boolean
   }
 
   extend type Query {
