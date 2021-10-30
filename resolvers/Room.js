@@ -47,8 +47,8 @@ const Room = {
 				.push()
 				.key
 			
-			const userRecord = roomHelpers.fetchUserData(room.host)
-			
+			const userRecord = await roomHelpers.fetchUserData(admin, room.host)
+
 			// Write the new data.
 			let updates = {}
 			updates[`/rooms/${newRoomKey}`] = {

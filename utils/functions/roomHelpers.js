@@ -32,7 +32,7 @@ const userHasRoomWithName = (admin, uid, name) =>
 	fetchUserRoom(admin, uid)
 		.then(val => val ? val.filter(b => b.name === name).length > 0 : false)
 
-const fetchUserData = async (uid) => {
+const fetchUserData = async (admin, uid) => {
 	return await admin.auth().getUser(uid)
 		.then((userRecord) => {
 			// See the UserRecord reference doc for the contents of userRecord.
