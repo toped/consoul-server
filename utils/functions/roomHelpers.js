@@ -45,6 +45,6 @@ module.exports = {
 	slugify, 
 	fetchRoom, 
 	roomExists, 
-	userHasRoomWithName
+	userHasRoomWithName,
 	fetchUserData
 }
