@@ -7,14 +7,18 @@ const Room = gql`
     id: ID
     host: String
     slug: String
+    players: [GameUser]
     settings: GameSettings
     #readonly
   }
 
   type GameUser {
     displayName: String
-    status: String
-    uid: String
+    email: String
+    photoURL: String
+    phoneNumber: String
+    uid: ID
+    isHost: Boolean
   }
 
   type GameSettings {
@@ -27,6 +31,7 @@ const Room = gql`
   input GameRoomInput {
     id: ID
     host: String
+    players: [GameUserInput]
     settings: GameSettingsInput
   }
 
@@ -34,6 +39,10 @@ const Room = gql`
     rounds: Int
     maxPlayers: Int
     timeLimit: Int
+  }
+
+  input GameUserInput {
+    uid: ID
   }
 
   extend type Query {

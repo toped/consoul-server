@@ -47,11 +47,23 @@ const Room = {
 				.push()
 				.key
 			
+			const userRecord = roomHelpers.fetchUserData(room.host)
+			
 			// Write the new data.
 			let updates = {}
 			updates[`/rooms/${newRoomKey}`] = {
 				id: newRoomKey,
 				slug: nanoid(5),
+				players: [
+					{
+						displayName: userRecord.displayName,
+						email: userRecord.email || null,
+						photoURL: userRecord.photoURL || null,
+						phoneNumber: userRecord.phoneNumber || null,
+						uid: userRecord.uid,
+						isHost: true
+					}
+				],
 				...room
 			}
 			
