@@ -52,7 +52,7 @@ const Room = gql`
   }
 
   extend type Query {
-    rooms(id: ID, host: String, slug: String): [GameRoom]
+    rooms(id: ID, host: String, playerUid: ID, slug: String): [GameRoom]
   }
 
   extend type Mutation {

@@ -12,7 +12,7 @@ const slugify = (text) =>
 		.replace(/--+/g, '-')
 
 const fetchRoom = async (admin, identifier) => {
-	if (!identifier || !identifier.value) throw new ApolloError('Must provide an id or slug to fetch room')
+	if (!identifier || !identifier.value) throw new ApolloError('Must provide a host, id, or slug to fetch room')
 
 	const room = await admin
 		.database()
@@ -24,6 +24,35 @@ const fetchRoom = async (admin, identifier) => {
 		.then(val => val && Object.keys(val).map(key => val[key])[0])
 	return room
 }
+
+const fetchRoomWithPlayer = async (admin, playerUid) => {
+	if (!playerUid) throw new ApolloError('Must provide player uid to fetch room with player')
+	
+	const room = await admin
+		.database()
+		.ref('rooms')
+		.once('value')
+		.then(snap => { return snap.val() })
+		.then(val => {
+			let foundRoom = null
+			if (val) {
+				for (let i = 0; Object.keys(val).map(key => val[key]).length; i++) {
+					const playerUidArr = Object.keys(val).map(key => val[key])[i].players.map(p => p.uid)
+					if (playerUidArr.includes(playerUid)) {
+						foundRoom = Object.keys(val).map(key => val[key])[i]
+						break
+					}
+				}
+			} else {
+				return null
+			}
+
+			return foundRoom
+		})
+	
+	return room    
+}
+
 
 const roomExists = (admin, host) =>
 	fetchRoom(admin, { identifier: 'host', value: host })
@@ -46,5 +75,6 @@ module.exports = {
 	fetchRoom, 
 	roomExists, 
 	userHasRoomWithName,
-	fetchUserData
+	fetchUserData,
+	fetchRoomWithPlayer
 }

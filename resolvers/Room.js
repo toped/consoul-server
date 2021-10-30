@@ -8,7 +8,7 @@ const pubsub = new PubSub()
 
 const Room = {
 	Query: {
-		async rooms(parent, { id, host, slug }, { admin }) {
+		async rooms(parent, { id, host, playerUid, slug }, { admin }) {
 
 			let rooms = []
 
@@ -19,7 +19,12 @@ const Room = {
 				return room ? [room] : []
 			}
 
-			if (!id && !host) rooms = await admin
+			if (playerUid) {
+				room = await roomHelpers.fetchRoomWithPlayer(admin, playerUid)
+				return room ? [room] : []
+			}
+
+			rooms = await admin
 				.database()
 				.ref('rooms')
 				.once('value')
