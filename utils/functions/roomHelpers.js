@@ -22,6 +22,7 @@ const fetchRoom = async (admin, identifier) => {
 		.once('value')
 		.then(snap => { return snap.val() })
 		.then(val => val && Object.keys(val).map(key => val[key])[0])
+		.catch(err => console.error(err))
 	return room
 }
 
@@ -36,7 +37,7 @@ const fetchRoomWithPlayer = async (admin, playerUid) => {
 		.then(val => {
 			let foundRoom = null
 			if (val) {
-				for (let i = 0; Object.keys(val).map(key => val[key]).length; i++) {
+				for (let i = 0; i < Object.keys(val).map(key => val[key]).length; i++) {
 					const playerUidArr = Object.keys(val).map(key => val[key])[i].players.map(p => p.uid)
 					if (playerUidArr.includes(playerUid)) {
 						foundRoom = Object.keys(val).map(key => val[key])[i]
@@ -49,7 +50,8 @@ const fetchRoomWithPlayer = async (admin, playerUid) => {
 
 			return foundRoom
 		})
-	
+		.catch(err => console.error(err))
+
 	return room    
 }
 
