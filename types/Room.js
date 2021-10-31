@@ -63,6 +63,7 @@ const Room = gql`
 
   type Subscription {
     roomUpdated(slug: String!): GameRoom
+    roomDeleted(slug: String!): GameRoom
   }
 `
 

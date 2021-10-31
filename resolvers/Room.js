@@ -115,22 +115,30 @@ const Room = {
 
 			if (room.host !== host)
 				throw new ApolloError(messages.errors.ROOM_CANNOT_MODIFY_REASON_PERMISSIONS)
-
+			
 			return admin
 				.database()
 				.ref(`/rooms/${room.id}`)
 				.remove()
-				.then(() => 'success')
+				.then(() => {
+					// publish subscription update
+					pubsub.publish('ROOM_DELETED', { roomDeleted: room })
+					return 'success'
+				})
 		}
 	},
 	Subscription: {
-		// Listening fro subscription
+		// Listening for subscription
 		roomUpdated: {
-			// More on pubsub later
 			subscribe: withFilter(() => pubsub.asyncIterator('ROOM_UPDATED'), (payload, variables) => {
 				return payload.roomUpdated.then(room => {
 					return room.slug === variables.slug
 				})				
+			}),
+		},
+		roomDeleted: {
+			subscribe: withFilter(() => pubsub.asyncIterator('ROOM_DELETED'), (payload, variables) => {
+				return payload.roomDeleted.slug === variables.slug
 			}),
 		}
 	}
