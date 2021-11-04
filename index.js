@@ -30,10 +30,15 @@ const TimerModule = () => {
 	const addTimer = (id, timer) => {
 		timers[id] = timer
 	}
+	const removeTimer = (id) => {
+		delete timers[id]
+	}
 	const getTimers = () => timers
+	
 	return {
 		addTimer,
-		getTimers
+		getTimers,
+		removeTimer
 	}
 }
 

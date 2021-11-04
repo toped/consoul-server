@@ -1,4 +1,5 @@
 const { ApolloError } = require('apollo-server')
+const { Timer } = require('easytimer.js')
 
 const slugify = (text) =>
 	text
@@ -72,11 +73,83 @@ const fetchUserData = async (admin, uid) => {
 		.catch(err => { throw new ApolloError(err)})
 }
 
+const updateTimers = (admin, timerModule, pubsub, room) => {
+	const timers = timerModule.getTimers()
+	const timer = timers[room.id]
+	
+	if (!timer) {
+		const countdownTimerInstance = new Timer()
+		const roundTimerInstance = new Timer()
+				
+		timerModule.addTimer(room.id, countdownTimerInstance)
+
+		let countdownTimeLeft = 4
+		let roundTimerTimeLeft = room.settings.timeLimit
+
+		// 3 - 2 - 1 - GO!
+		countdownTimerInstance.start({ countdown: true, startValues: { seconds: countdownTimeLeft } })
+
+		countdownTimerInstance.addEventListener('secondsUpdated', (e) => {
+			const seconds = e.detail.timer.getTotalTimeValues().seconds
+			admin
+				.database()
+				.ref(`/rooms/${room.id}/game/countDownTime`)
+				.set(seconds, (error) => {
+					if (error) {
+						console.log('Timer error.' + error)
+					} else {
+						const updatedRoom = fetchRoom(admin, { identifier: 'id', value: room.id })
+						console.log('***publish timer change***')
+						pubsub.publish('ROOM_UPDATED', { roomUpdated: updatedRoom })
+					}
+				})
+		})
+		countdownTimerInstance.addEventListener('targetAchieved', (e) => {
+			timerModule.addTimer(room.id, roundTimerInstance)
+			roundTimerInstance.start({ countdown: true, startValues: { seconds: roundTimerTimeLeft } })
+		})
+
+		roundTimerInstance.addEventListener('secondsUpdated', (e) => {
+			const seconds = e.detail.timer.getTotalTimeValues().seconds
+			admin
+				.database()
+				.ref(`/rooms/${room.id}/game/roundTime`)
+				.set(seconds, (error) => {
+					if (error) {
+						console.log('Timer error.' + error)
+					} else {
+						const updatedRoom = fetchRoom(admin, { identifier: 'id', value: room.id })
+						console.log('***publish timer change***')
+						pubsub.publish('ROOM_UPDATED', { roomUpdated: updatedRoom })
+					}
+				})
+		})
+		roundTimerInstance.addEventListener('targetAchieved', (e) => {
+			timerModule.removeTimer(room.id)
+
+			// let client know the round ended
+			admin
+				.database()
+				.ref(`/rooms/${room.id}/game/roundTimeElapsed`)
+				.set(true, (error) => {
+					if (error) {
+						console.log('Timer error.' + error)
+					} else {
+						const updatedRoom = fetchRoom(admin, { identifier: 'id', value: room.id })
+						console.log('***publish timer change***')
+						pubsub.publish('ROOM_UPDATED', { roomUpdated: updatedRoom })
+					}
+				})
+		})
+	}
+}
+
 module.exports = {
 	slugify, 
 	fetchRoom, 
 	roomExists, 
 	userHasRoomWithName,
 	fetchUserData,
-	fetchRoomWithPlayer
+	fetchRoomWithPlayer,
+	updateTimers
 }

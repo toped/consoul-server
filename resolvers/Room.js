@@ -1,6 +1,5 @@
 const { ApolloError, PubSub } = require('apollo-server')
 const { withFilter } = require('graphql-subscriptions')
-const { Timer } = require('easytimer.js')
 const { nanoid } = require('nanoid')
 const roomHelpers = require('../utils/functions/roomHelpers')
 const messages = require('../utils/functions/messages')
@@ -78,7 +77,7 @@ const Room = {
 				.update(updates)
 				.then(() => roomHelpers.fetchRoom(admin, { identifier: 'host', value: room.host }))
 		},
-		async updateRoom(parent, { room }, { admin }) {
+		async updateRoom(parent, { room }, { admin, timerModule }) {
 			room = JSON.parse(JSON.stringify(room))
 
 			const currentRoom = await roomHelpers.fetchRoom(admin, { identifier: 'id', value: room.id })
@@ -86,12 +85,18 @@ const Room = {
 			if (!currentRoom)
 				throw new ApolloError(messages.errors.ROOM_DOES_NOT_EXIST)
 			
+			if (room.triggerRound) {
+				// Start Countdowns
+				roomHelpers.updateTimers(admin, timerModule, pubsub, room)	
+			}
+
 			// Write the new data.
 			// TO-DO: we need checks to make sure invalid data isn't written to db
 			let updates = {}
 			updates[`/rooms/${room.id}`] = {
 				...currentRoom,
-				...room
+				...room,
+				triggerRound: false
 			}
 
 			return admin
@@ -102,10 +107,12 @@ const Room = {
 					const updatedRoom = roomHelpers.fetchRoom(admin, { identifier: 'id', value: room.id })
 					
 					// publish subscription update
+					console.log('---publish room update---')
 					pubsub.publish('ROOM_UPDATED', { roomUpdated: updatedRoom })
 
 					return updatedRoom
 				})
+			
 		},
 		async deleteRoom(parent, { host }, { admin }) {
 			const room = await roomHelpers.fetchRoom(admin, { identifier: 'host', value: host })
