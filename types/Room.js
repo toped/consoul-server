@@ -36,7 +36,14 @@ const Room = gql`
     countDownTime: Int
     roundTime: Int
     roundTimeElapsed: Boolean
+    cards: [GameCard]
     gameOver: Boolean
+  }
+
+  type GameCard {
+    user: ID
+    text: String
+    revealed: Boolean
   }
 
   # INPUTS
@@ -74,7 +81,14 @@ const Room = gql`
     countDownTime: Int
     roundTime: Int
     roundTimeElapsed: Boolean
+    cards: [GameCardInput]
     gameOver: Boolean
+  }
+
+  input GameCardInput {
+    user: ID
+    text: String
+    revealed: Boolean
   }
 
   extend type Query {
