@@ -44,6 +44,8 @@ const Room = gql`
     user: ID
     text: String
     revealed: Boolean
+    highlighted: Boolean
+    selected: Boolean
   }
 
   # INPUTS
@@ -89,6 +91,8 @@ const Room = gql`
     user: ID
     text: String
     revealed: Boolean
+    highlighted: Boolean
+    selected: Boolean
   }
 
   extend type Query {
