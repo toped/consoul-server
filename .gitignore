@@ -54,7 +54,7 @@ typings/
 
 # Optional eslint cache
 .eslintcache
-service_keu.json
+service_key.json
 
 # Microbundle cache
 .rpt2_cache/
@@ -107,5 +107,3 @@ dist
 # TernJS port file
 .tern-port
 /firebaseFunctions
-
-service_key.json
