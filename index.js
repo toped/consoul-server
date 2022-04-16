@@ -69,9 +69,9 @@ const resolvers = require('./resolvers');
 		},
 	})
 	
-	apolloServer.listen().then(({ url }) => {
-		console.warn(`> 🚀  Apollo GraphQL Server ready on ${process.env.URL}${apolloServer.graphqlPath}`)
-		console.warn(`> 🚀 Subscription endpoint ready at ws://localhost:${port}${apolloServer.subscriptionsPath}`)
+	apolloServer.listen(8080).then(({ url }) => {
+		console.warn(`> 🚀  Apollo GraphQL Server ready on ${url}`)
+		console.warn(`> 🚀 Subscription endpoint ready at ws://${url}${apolloServer.subscriptionsPath}`)
 		console.warn('Query at studio.apollographql.com/dev')
 	}).catch(err => {throw err})
 })()
