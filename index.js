@@ -48,7 +48,6 @@ const resolvers = require('./resolvers');
 			req,
 			res,
 			admin,
-			twitterClient,
 			timerModule,
 		}
 	}
