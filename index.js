@@ -11,8 +11,6 @@ const keyVaultUri = `https://${keyVaultName}.vault.azure.net`
 const credential = new DefaultAzureCredential()
 const secretClient = new SecretClient(keyVaultUri, credential)
 
-var Twit = require('twit')
-
 const typeDefs = require('./types')
 const resolvers = require('./resolvers');
 
@@ -20,15 +18,6 @@ const resolvers = require('./resolvers');
 	var serviceAccountSecret = await secretClient.getSecret('firebase-service-key')
 	var serviceAccount = JSON.parse(serviceAccountSecret.value)
 
-	var twitterClient = new Twit({
-		consumer_key: process.env.CONSUMER_KEY,
-		consumer_secret: process.env.CONSUMER_SECRET,
-		access_token: process.env.ACCESS_TOKEN,
-		access_token_secret: process.env.ACCESS_TOKEN_SECRET,
-		timeout_ms: 60 * 1000, // optional HTTP request timeout to apply to all requests.
-		strictSSL: true // optional - requires SSL certificates to be valid.
-	})
-	
 	admin.initializeApp({
 		credential: admin.credential.cert(serviceAccount),
 		databaseURL: 'https://memez-f18eb.firebaseio.com/',
@@ -86,7 +75,6 @@ const resolvers = require('./resolvers');
 		console.warn(`> 🚀 Subscription endpoint ready at ws://localhost:${port}${apolloServer.subscriptionsPath}`)
 		console.warn('Query at studio.apollographql.com/dev')
 	}).catch(err => {throw err})
-
 })()
 
 

@@ -1,5 +1,4 @@
 const { gql } = require('apollo-server')
-const Twitter = require('./Twitter')
 const Room = require('./Room')
 const Game = require('./Game')
 
@@ -13,7 +12,6 @@ const types = gql`
   type Subscriptions {
     _empty: String
   }
-  ${Twitter}
   ${Room}
   ${Game}
 `
