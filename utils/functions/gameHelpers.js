@@ -1,5 +1,5 @@
 
-const { ApolloError } = require('apollo-server')
+const { ApolloError } = require('apollo-server-errors')
 const _ = require('lodash')
 
 const fetchCategory = async (admin, identifier) => {

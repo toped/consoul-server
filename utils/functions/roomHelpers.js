@@ -1,4 +1,4 @@
-const { ApolloError } = require('apollo-server')
+const { ApolloError } = require('apollo-server-errors')
 const { Timer } = require('easytimer.js')
 
 const slugify = (text) =>

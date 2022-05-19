@@ -1,4 +1,4 @@
-const { ApolloError } = require('apollo-server')
+const { ApolloError } = require('apollo-server-errors')
 const gameHelpers = require('../utils/functions/gameHelpers')
 const messages = require('../utils/functions/messages')
 

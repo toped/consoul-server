@@ -1,5 +1,5 @@
-const { ApolloError, PubSub } = require('apollo-server')
-const { withFilter } = require('graphql-subscriptions')
+const { ApolloError } = require('apollo-server-errors')
+const { PubSub, withFilter } = require('graphql-subscriptions')
 const { nanoid } = require('nanoid')
 const roomHelpers = require('../utils/functions/roomHelpers')
 const messages = require('../utils/functions/messages')
@@ -8,7 +8,6 @@ const pubsub = new PubSub()
 const Room = {
 	Query: {
 		async rooms(parent, { id, host, playerUid, slug }, { admin }) {
-
 			let rooms = []
 
 			if (id || host || slug) {
