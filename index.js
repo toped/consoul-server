@@ -5,7 +5,6 @@ const { ApolloServer, PubSub, gql } = require('apollo-server')
 const { DefaultAzureCredential } = require("@azure/identity")
 const { SecretClient }  = require("@azure/keyvault-secrets")
 
-const port = process.env.PORT
 const keyVaultName = process.env.KEY_VAULT_NAME || 'consoullabs-dev-kv'
 const keyVaultUri = `https://${keyVaultName}.vault.azure.net`
 const credential = new DefaultAzureCredential()
