@@ -127,7 +127,7 @@ const secretClient = new SecretClient(keyVaultUri, credential);
 
 	server.applyMiddleware({ app })
 
-	const PORT = 80
+	const PORT = 8080
 	
 	// Now that our HTTP server is fully set up, we can listen to it.
 	httpServer.listen(PORT, (err) => {
