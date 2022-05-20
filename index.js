@@ -86,8 +86,20 @@ const secretClient = new SecretClient(keyVaultUri, credential);
 		},
 		onDisconnect(ctx, code, reason) {
 			console.log('Disconnected!')
+			console.log('code: ', code)
+			console.log('reason: ', reason)
 		},
-	 	}, wsServer)
+		onError(ctx, message, error) {
+			console.log('Error occurred!')
+			console.log('message: ', message)
+			console.log('error: ', error)
+		},
+		onClose(ctx, code, error) {
+			console.log('Error occurred!')
+			console.log('code: ', code)
+			console.log('error: ', error)
+		}
+	}, wsServer)
 
 
 	// Set up ApolloServer.
