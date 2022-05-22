@@ -64,6 +64,7 @@ const Room = {
 						photoURL: userRecord.photoURL || null,
 						phoneNumber: userRecord.phoneNumber || null,
 						uid: userRecord.uid,
+						anonymousUser: false,
 						isHost: true
 					}
 				],

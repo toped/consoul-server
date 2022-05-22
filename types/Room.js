@@ -20,6 +20,7 @@ const Room = gql`
     phoneNumber: String
     uid: ID
     isHost: Boolean
+    anonymousUser: Boolean
   }
 
   type GameSettings {
@@ -73,6 +74,7 @@ const Room = gql`
     phoneNumber: String
     uid: ID
     isHost: Boolean
+    anonymousUser: Boolean
   }
 
   input GameInput {
