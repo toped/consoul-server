@@ -73,6 +73,15 @@ const fetchUserData = async (admin, uid) => {
 		.catch(err => { throw new ApolloError(err)})
 }
 
+const removeTimer = (timerModule, room) => {
+	const timers = timerModule.getTimers()
+	const timer = timers[room.id]
+	if(timer) {
+		timer.stop();
+		timerModule.removeTimer(room.id)
+	}
+}
+
 const updateTimers = (admin, timerModule, pubsub, room) => {
 	const timers = timerModule.getTimers()
 	const timer = timers[room.id]
@@ -99,7 +108,7 @@ const updateTimers = (admin, timerModule, pubsub, room) => {
 						console.log('Timer error.' + error)
 					} else {
 						const updatedRoom = fetchRoom(admin, { identifier: 'id', value: room.id })
-						console.log('***publish timer change***')
+						console.log('***publish countdown timer change***')
 						pubsub.publish('ROOM_UPDATED', { roomUpdated: updatedRoom })
 					}
 				})
@@ -119,13 +128,13 @@ const updateTimers = (admin, timerModule, pubsub, room) => {
 						console.log('Timer error.' + error)
 					} else {
 						const updatedRoom = fetchRoom(admin, { identifier: 'id', value: room.id })
-						console.log('***publish timer change***')
+						console.log('***publish round timer change***')
 						pubsub.publish('ROOM_UPDATED', { roomUpdated: updatedRoom })
 					}
 				})
 		})
 		roundTimerInstance.addEventListener('targetAchieved', (e) => {
-			timerModule.removeTimer(room.id)
+			removeTimer(timerModule, room)
 
 			// let client know the round ended
 			admin
@@ -136,7 +145,7 @@ const updateTimers = (admin, timerModule, pubsub, room) => {
 						console.log('Timer error.' + error)
 					} else {
 						const updatedRoom = fetchRoom(admin, { identifier: 'id', value: room.id })
-						console.log('***publish timer change***')
+						console.log('***publish timer change target achieved***')
 						pubsub.publish('ROOM_UPDATED', { roomUpdated: updatedRoom })
 					}
 				})
@@ -151,5 +160,6 @@ module.exports = {
 	userHasRoomWithName,
 	fetchUserData,
 	fetchRoomWithPlayer,
-	updateTimers
+	updateTimers,
+	removeTimer
 }

@@ -114,7 +114,7 @@ const Room = {
 				})
 			
 		},
-		async deleteRoom(parent, { host }, { admin }) {
+		async deleteRoom(parent, { host }, { admin, timerModule }) {
 			const room = await roomHelpers.fetchRoom(admin, { identifier: 'host', value: host })
 
 			if (!room)
@@ -123,11 +123,13 @@ const Room = {
 			if (room.host !== host)
 				throw new ApolloError(messages.errors.ROOM_CANNOT_MODIFY_REASON_PERMISSIONS)
 			
+			roomHelpers.removeTimer(timerModule, room)	
 			return admin
 				.database()
 				.ref(`/rooms/${room.id}`)
 				.remove()
 				.then(() => {
+					console.log('room deleted---')
 					// publish subscription update
 					pubsub.publish('ROOM_DELETED', { roomDeleted: room })
 					return 'success'
