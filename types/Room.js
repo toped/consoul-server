@@ -104,7 +104,7 @@ const Room = gql`
   extend type Mutation {
     createRoom(room: GameRoomInput): GameRoom
     updateRoom(room: GameRoomInput): GameRoom
-    deleteRoom(host: String): String
+    deleteRoom(host: String): GameRoom
   }
 
   type Subscription {

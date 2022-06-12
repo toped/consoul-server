@@ -73,6 +73,23 @@ const fetchUserData = async (admin, uid) => {
 		.catch(err => { throw new ApolloError(err)})
 }
 
+const checkHostIsAvailable = (room) => {
+	console.log('checkPlayers ->', room)
+	console.log(!room.players.map(p=>p.uid).includes(room.host))
+	if(!room.players.map(p=>p.uid).includes(room.host)) {
+		let potentialHostList = room.players
+		
+		if(potentialHostList.length === 0) {
+			return room
+		} else {
+			room.host = room.players[0].uid
+			room.players[0].isHost = true
+		}
+	}
+
+	return room
+}
+
 const removeTimer = (timerModule, room) => {
 	const timers = timerModule.getTimers()
 	const timer = timers[room.id]
@@ -161,5 +178,6 @@ module.exports = {
 	fetchUserData,
 	fetchRoomWithPlayer,
 	updateTimers,
-	removeTimer
+	removeTimer,
+	checkHostIsAvailable
 }

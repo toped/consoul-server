@@ -90,28 +90,41 @@ const Room = {
 				roomHelpers.updateTimers(admin, timerModule, pubsub, room)	
 			}
 
-			// Write the new data.
-			// TO-DO: we need checks to make sure invalid data isn't written to db
-			let updates = {}
-			updates[`/rooms/${room.id}`] = {
-				...currentRoom,
-				...room,
-				triggerRound: false
+			room = roomHelpers.checkHostIsAvailable(room)
+
+			if(room.players.length) {
+				// Write the new data.
+				// TO-DO: we need checks to make sure invalid data isn't written to db
+				let updates = {}
+				updates[`/rooms/${room.id}`] = {
+					...currentRoom,
+					...room,
+					triggerRound: false
+				}
+
+				return admin
+					.database()
+					.ref()
+					.update(JSON.parse(JSON.stringify(updates)))
+					.then(() => {
+						const updatedRoom = roomHelpers.fetchRoom(admin, { identifier: 'id', value: room.id })
+						
+						// publish subscription update
+						console.log('---publish room update---')
+						pubsub.publish('ROOM_UPDATED', { roomUpdated: updatedRoom })
+
+						return updatedRoom
+					})
+			} else {
+				return admin
+					.database()
+					.ref(`/rooms/${room.id}`)
+					.remove()
+					.then(() => {
+						console.log('room deleted---')
+						return room
+					})
 			}
-
-			return admin
-				.database()
-				.ref()
-				.update(JSON.parse(JSON.stringify(updates)))
-				.then(() => {
-					const updatedRoom = roomHelpers.fetchRoom(admin, { identifier: 'id', value: room.id })
-					
-					// publish subscription update
-					console.log('---publish room update---')
-					pubsub.publish('ROOM_UPDATED', { roomUpdated: updatedRoom })
-
-					return updatedRoom
-				})
 			
 		},
 		async deleteRoom(parent, { host }, { admin, timerModule }) {
@@ -132,7 +145,7 @@ const Room = {
 					console.log('room deleted---')
 					// publish subscription update
 					pubsub.publish('ROOM_DELETED', { roomDeleted: room })
-					return 'success'
+					return room
 				})
 		}
 	},
@@ -147,6 +160,9 @@ const Room = {
 		},
 		roomDeleted: {
 			subscribe: withFilter(() => pubsub.asyncIterator('ROOM_DELETED'), (payload, variables) => {
+				console.log(`payload.roomDeleted.slug === variables.slug`)
+				console.log(payload.roomDeleted.slug)
+				console.log(variables.slug)
 				return payload.roomDeleted.slug === variables.slug
 			}),
 		}
