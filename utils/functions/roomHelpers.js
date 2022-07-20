@@ -1,5 +1,6 @@
 const { ApolloError } = require('apollo-server-errors')
 const { Timer } = require('easytimer.js')
+const messages = require('./messages')
 
 const slugify = (text) =>
 	text
@@ -74,7 +75,7 @@ const fetchUserData = async (admin, uid) => {
 }
 
 const checkHostIsAvailable = (room) => {
-	console.log('checkPlayers ->', room)
+	console.log('checkHostIsAvailable ->', room)
 	console.log(!room.players.map(p=>p.uid).includes(room.host))
 	if(!room.players.map(p=>p.uid).includes(room.host)) {
 		let potentialHostList = room.players
@@ -88,6 +89,20 @@ const checkHostIsAvailable = (room) => {
 	}
 
 	return room
+}
+
+const checkRoomMeetsRequirements = (room) => {
+	console.log('check room requirements ->', room)
+
+	const requirements = room.game.requirements
+
+	console.log('got requirements ->', requirements)
+
+	if(!requirements) return
+
+	if(requirements.minPlayers && (room.players.length < requirements.minPlayers)) {
+		throw new ApolloError(messages.errors.MIN_PLAYER_REQUIREMENT(requirements.minPlayers))
+	}
 }
 
 const removeTimer = (timerModule, room) => {
@@ -179,5 +194,6 @@ module.exports = {
 	fetchRoomWithPlayer,
 	updateTimers,
 	removeTimer,
-	checkHostIsAvailable
+	checkHostIsAvailable,
+	checkRoomMeetsRequirements
 }

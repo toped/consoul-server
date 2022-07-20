@@ -84,10 +84,15 @@ const Room = {
 
 			if (!currentRoom)
 				throw new ApolloError(messages.errors.ROOM_DOES_NOT_EXIST)
+
 			
 			if (room.triggerRound) {
 				// Start Countdowns
 				roomHelpers.updateTimers(admin, timerModule, pubsub, room)	
+			}
+
+			if(room.started && !room.game.currentRound) {
+				roomHelpers.checkRoomMeetsRequirements(currentRoom)
 			}
 
 			room = roomHelpers.checkHostIsAvailable(room)
@@ -99,6 +104,10 @@ const Room = {
 				updates[`/rooms/${room.id}`] = {
 					...currentRoom,
 					...room,
+					game: {
+						...currentRoom.game,
+						...room.game
+					},
 					triggerRound: false
 				}
 
