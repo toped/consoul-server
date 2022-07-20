@@ -80,32 +80,48 @@ const Room = {
 		async updateRoom(parent, { room }, { admin, timerModule }) {
 			room = JSON.parse(JSON.stringify(room))
 
-			const currentRoom = await roomHelpers.fetchRoom(admin, { identifier: 'id', value: room.id })
+			const roomBeforeUpdate = await roomHelpers.fetchRoom(admin, { identifier: 'id', value: room.id })
+			const requirements = roomBeforeUpdate.game.requirements
 
-			if (!currentRoom)
-				throw new ApolloError(messages.errors.ROOM_DOES_NOT_EXIST)
+			if (!roomBeforeUpdate)
+				throw new ApolloError(messages.errors.NO_ROOM_FOUND)
 
-			
 			if (room.triggerRound) {
 				// Start Countdowns
 				roomHelpers.updateTimers(admin, timerModule, pubsub, room)	
 			}
 
-			if(room.started && !room.game.currentRound) {
-				roomHelpers.checkRoomMeetsRequirements(currentRoom)
+			if(room.started && !room.game.currentRound && !roomHelpers.roomMeetsGameRequirements(room, requirements)) {
+				throw new ApolloError(messages.errors.MIN_PLAYER_REQUIREMENT)
 			}
-
+			
 			room = roomHelpers.checkHostIsAvailable(room)
 
-			if(room.players.length) {
+			console.log(`number of players in room is ${room.players.length}`)
+			if(room.game.currentRound && (!room.players.length || !roomHelpers.roomMeetsGameRequirements(room, requirements))) {
+				if((room.game.currentRound && !roomHelpers.roomMeetsGameRequirements(room, requirements))) {
+					console.log("game has started, but requirements not met")
+				}
+				roomHelpers.removeTimer(timerModule, room)	
+				return admin
+					.database()
+					.ref(`/rooms/${room.id}`)
+					.remove()
+					.then(() => {
+						console.log('room deleted---')
+						// publish subscription update
+					    pubsub.publish('ROOM_DELETED', { roomDeleted: room })
+						return room
+					})
+			} else {
 				// Write the new data.
 				// TO-DO: we need checks to make sure invalid data isn't written to db
 				let updates = {}
 				updates[`/rooms/${room.id}`] = {
-					...currentRoom,
+					...roomBeforeUpdate,
 					...room,
 					game: {
-						...currentRoom.game,
+						...roomBeforeUpdate.game,
 						...room.game
 					},
 					triggerRound: false
@@ -123,15 +139,6 @@ const Room = {
 						pubsub.publish('ROOM_UPDATED', { roomUpdated: updatedRoom })
 
 						return updatedRoom
-					})
-			} else {
-				return admin
-					.database()
-					.ref(`/rooms/${room.id}`)
-					.remove()
-					.then(() => {
-						console.log('room deleted---')
-						return room
 					})
 			}
 			

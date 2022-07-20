@@ -6,6 +6,6 @@ module.exports = {
 		ROOM_CANNOT_MODIFY_REASON_PERMISSIONS: 'ROOM_CANNOT_MODIFY_REASON_PERMISSIONS',
 		GAME_EXISTS: 'GAME_EXISTS',
 		NO_GAME_FOUND: 'NO_GAME_FOUND',
-		MIN_PLAYER_REQUIREMENT: (minPlayers) => `This games need at least ${minPlayers} players to start the game`
+		MIN_PLAYER_REQUIREMENT: 'Not enough players to start the game'
 	}
 }

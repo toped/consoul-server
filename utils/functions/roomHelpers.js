@@ -75,8 +75,8 @@ const fetchUserData = async (admin, uid) => {
 }
 
 const checkHostIsAvailable = (room) => {
-	console.log('checkHostIsAvailable ->', room)
-	console.log(!room.players.map(p=>p.uid).includes(room.host))
+	//console.log('checkHostIsAvailable ->', room)
+	//console.log(!room.players.map(p=>p.uid).includes(room.host))
 	if(!room.players.map(p=>p.uid).includes(room.host)) {
 		let potentialHostList = room.players
 		
@@ -91,18 +91,20 @@ const checkHostIsAvailable = (room) => {
 	return room
 }
 
-const checkRoomMeetsRequirements = (room) => {
-	console.log('check room requirements ->', room)
-
-	const requirements = room.game.requirements
-
+const roomMeetsGameRequirements = (room, requirements) => {
+	console.log(`roomMeetsGameRequirements says number of players in room is ${room.players.length}`)
+	console.log(room)
 	console.log('got requirements ->', requirements)
 
-	if(!requirements) return
+	if(!requirements) return true
 
 	if(requirements.minPlayers && (room.players.length < requirements.minPlayers)) {
-		throw new ApolloError(messages.errors.MIN_PLAYER_REQUIREMENT(requirements.minPlayers))
+		console.log("RETURNING FALSE")
+		return false
 	}
+	console.log(`players in room: ${room.players.length}, player requirement: ${requirements.minPlayers}`)
+
+	return true
 }
 
 const removeTimer = (timerModule, room) => {
@@ -195,5 +197,5 @@ module.exports = {
 	updateTimers,
 	removeTimer,
 	checkHostIsAvailable,
-	checkRoomMeetsRequirements
+	roomMeetsGameRequirements
 }
