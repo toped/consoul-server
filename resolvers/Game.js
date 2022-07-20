@@ -4,10 +4,10 @@ const messages = require('../utils/functions/messages')
 
 const Game = {
 	Query: {
-		async categories(parent, _, { admin }) {
+		async games(parent, _, { admin }) {
 			return admin
 				.database()
-				.ref('categories')
+				.ref('games')
 				.once('value')
 				.then(snap => snap.val())
 				.then(val => val && Object.keys(val).map(key => val[key]) || [])
@@ -15,45 +15,45 @@ const Game = {
 					return new ApolloError(err)
 				})
 		},
-		async category(parent, { title }, { admin }) {
-			return gameHelpers.fetchCategory(admin, { identifier: 'title', value: title })
+		async game(parent, { title }, { admin }) {
+			return gameHelpers.fetchGame(admin, { identifier: 'title', value: title })
 		}
 	},
 	Mutation: {
-		async createCategory(parent, { category }, { admin }) {
-			// Check if category with title exists
-			if (await gameHelpers.categoryExists(admin, category.title))
-				return new ApolloError(messages.errors.CATEGORY_EXISTS)
+		async createGame(parent, { game }, { admin }) {
+			// Check if game with title exists
+			if (await gameHelpers.gameExists(admin, game.title))
+				return new ApolloError(messages.errors.GAME_EXISTS)
 
 			// Get a key for a new room.
-			const newCategoryKey = admin
+			const newGameKey = admin
 				.database()
 				.ref()
-				.child('/categories')
+				.child('/games')
 				.push()
 				.key
 			// Write the new data.
 			let updates = {}
-			updates[`/categories/${category.title}`] = {
-				id: newCategoryKey,
-				...category
+			updates[`/games/${game.title}`] = {
+				id: newGameKey,
+				...game
 			}
 
 			return admin
 				.database()
 				.ref()
 				.update(updates)
-				.then(() => gameHelpers.fetchCategory(admin, { identifier: 'title', value: category.title }))
+				.then(() => gameHelpers.fetchGame(admin, { identifier: 'title', value: game.title }))
 		},
-		async deleteCategory(parent, { title }, { admin }) {
-			const category = await gameHelpers.fetchCategory(admin, { identifier: 'title', value: title })
+		async deleteGame(parent, { title }, { admin }) {
+			const game = await gameHelpers.fetchGame(admin, { identifier: 'title', value: title })
 
-			if (!category)
-				return new ApolloError(messages.errors.NO_CATEGORY_FOUND)
+			if (!game)
+				return new ApolloError(messages.errors.NO_GAME_FOUND)
 
 			return admin
 				.database()
-				.ref(`/categories/${title}`)
+				.ref(`/games/${title}`)
 				.remove()
 				.then(() => 'success')
 		}

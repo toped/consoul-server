@@ -9,7 +9,7 @@ const Room = gql`
     slug: String
     players: [GameUser]
     started: Boolean
-    settings: GameSettings
+    settings: RoomSettings
     game: Game
   }
 
@@ -23,30 +23,10 @@ const Room = gql`
     anonymousUser: Boolean
   }
 
-  type GameSettings {
+  type RoomSettings {
     rounds: Int
     maxPlayers: Int
     timeLimit: Int
-  }
-
-  type Game {
-    rounds: Int
-    timeLimit: Int
-    currentRound: Int
-    currentTurn: Int
-    countDownTime: Int
-    roundTime: Int
-    roundTimeElapsed: Boolean
-    cards: [GameCard]
-    gameOver: Boolean
-  }
-
-  type GameCard {
-    user: ID
-    text: String
-    revealed: Boolean
-    highlighted: Boolean
-    selected: Boolean
   }
 
   # INPUTS
@@ -56,12 +36,12 @@ const Room = gql`
     slug: String
     started: Boolean
     players: [GameUserInput]
-    settings: GameSettingsInput
+    settings: RoomSettingsInput
     game: GameInput
     triggerRound: Boolean
   }
 
-  input GameSettingsInput {
+  input RoomSettingsInput {
     rounds: Int
     maxPlayers: Int
     timeLimit: Int
@@ -75,26 +55,6 @@ const Room = gql`
     uid: ID
     isHost: Boolean
     anonymousUser: Boolean
-  }
-
-  input GameInput {
-    rounds: Int
-    timeLimit: Int
-    currentRound: Int
-    currentTurn: Int
-    countDownTime: Int
-    roundTime: Int
-    roundTimeElapsed: Boolean
-    cards: [GameCardInput]
-    gameOver: Boolean
-  }
-
-  input GameCardInput {
-    user: ID
-    text: String
-    revealed: Boolean
-    highlighted: Boolean
-    selected: Boolean
   }
 
   extend type Query {

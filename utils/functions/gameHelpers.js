@@ -2,22 +2,22 @@
 const { ApolloError } = require('apollo-server-errors')
 const _ = require('lodash')
 
-const fetchCategory = async (admin, identifier) => {
-	if (!identifier || !identifier.value) throw new ApolloError('Must provide a title to fetch category')
+const fetchGame = async (admin, identifier) => {
+	if (!identifier || !identifier.value) throw new ApolloError('Must provide a title to fetch game')
 
-	const category = await admin
+	const game = await admin
 		.database()
-		.ref('categories')
+		.ref('games')
 		.orderByChild(identifier.identifier)
 		.equalTo(identifier.value)
 		.once('value')
 		.then(snap => { return snap.val() })
 		.then(val => val && Object.keys(val).map(key => val[key])[0])
-	return category
+	return game
 }
 
-const categoryExists = (admin, title) =>
-	fetchCategory(admin, { identifier: 'title', value: title })
+const gameExists = (admin, title) =>
+	fetchGame(admin, { identifier: 'title', value: title })
 
 const fetchMemes = async (admin, seenMemes) => {
 
@@ -82,6 +82,6 @@ generateV4ReadSignedUrl = async (bucket, filename) => {
 
 module.exports = {
 	fetchMemes,
-	fetchCategory,
-	categoryExists
+	fetchGame,
+	gameExists
 }
